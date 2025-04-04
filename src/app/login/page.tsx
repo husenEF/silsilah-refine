@@ -15,7 +15,9 @@ export default function Login() {
         flexDirection: "column",
       }}
     >
-      <button onClick={() => login({})}>Sign in</button>
+      <button onClick={() => login({
+        email:'admin@mail.com'
+      })}>Sign in</button>
       <p>
         Powered by
         <img
