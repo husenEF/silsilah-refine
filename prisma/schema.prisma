@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(uuid()) @db.Uuid
+  nickname    String
+  name        String?
+  genderId    Boolean   @map("gender_id")
+  fatherId    String?   @map("father_id") @db.Uuid
+  motherId    String?   @map("mother_id") @db.Uuid
+  parentId    String?   @map("parent_id") @db.Uuid
+  dob         DateTime? @map("dob") @db.Date
+  yob         Int?      @map("yob")
+  birthOrder  Int?      @map("birth_order") @db.SmallInt
+  dod         DateTime? @map("dod") @db.Date
+  yod         Int?      @map("yod")
+  email       String?   @unique
+  password    String?
+  address     String?
+  city        String?
+  phone       String?
+  photoPath   String?   @map("photo_path")
+  managerId   String?   @map("manager_id") @db.Uuid
+  rememberToken String? @map("remember_token")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  father      User?     @relation("FatherChildren", fields: [fatherId], references: [id])
+  mother      User?     @relation("MotherChildren", fields: [motherId], references: [id])
+  parent      User?     @relation("ParentChildren", fields: [parentId], references: [id])
+  manager     User?     @relation("ManagerUsers", fields: [managerId], references: [id])
+
+  // Inverse relations
+  fatherChildren User[] @relation("FatherChildren")
+  motherChildren User[] @relation("MotherChildren")
+  parentChildren User[] @relation("ParentChildren")
+  managedUsers   User[] @relation("ManagerUsers")
+
+  UserMetadata UserMetadata[]
+  @@map("users")
+}
+
+model PasswordReset {
+  email     String
+  token     String    @unique
+  createdAt DateTime? @map("created_at")
+
+  @@index([email])
+  @@map("password_resets")
+}
+
+model Couple {
+  id            String    @id @default(uuid()) @db.Uuid
+  husbandId     String    @map("husband_id") @db.Uuid
+  wifeId        String    @map("wife_id") @db.Uuid
+  marriageDate  DateTime? @map("marriage_date") @db.Date
+  divorceDate   DateTime? @map("divorce_date") @db.Date
+  managerId     String?   @map("manager_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@unique([husbandId, wifeId])
+  @@map("couples")
+}
+
+model UserMetadata {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  key       String   
+  value     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([key])
+  @@map("user_metadata")
+}

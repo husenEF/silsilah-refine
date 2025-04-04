@@ -36,7 +36,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "prisma/seed.mjs"
   ],
   "exclude": [
     "node_modules"
